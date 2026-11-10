@@ -10,9 +10,8 @@ class ProductTemplate(models.Model):
         # so they see prices inc. 25% VAT and can compare with Norwegian webshops.
         # The pricelist price is already resolved before this method is called,
         # so Norwegian visitors still see their own pricelist prices.
-        geoip = getattr(request, 'geoip', None) if request else None
-        country = getattr(geoip, 'country', None) if geoip else None
-        if country and getattr(country, 'iso_code', None) == 'NO':
+        country_code = request.geoip.country_code if request else None
+        if country_code == 'NO':
             if product_taxes is None:
                 # Same default as website_sale, computed here because the
                 # fiscal-position mapping must be skipped for these visitors.
