@@ -1,7 +1,7 @@
 {
     'name': 'Show Prices Inc. VAT',
     'author': 'Implefy AB',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Website/Website',
     'summary': 'Show VAT-inclusive prices for Norwegian visitors on the webshop',
     'description': """
