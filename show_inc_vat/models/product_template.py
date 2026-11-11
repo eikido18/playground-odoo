@@ -1,5 +1,6 @@
 from odoo import models
-from odoo.http import request
+
+from odoo.addons.show_inc_vat.tools import is_norwegian_visitor
 
 
 class ProductTemplate(models.Model):
@@ -10,8 +11,7 @@ class ProductTemplate(models.Model):
         # so they see prices inc. 25% VAT and can compare with Norwegian webshops.
         # The pricelist price is already resolved before this method is called,
         # so Norwegian visitors still see their own pricelist prices.
-        country_code = request.geoip.country_code if request else None
-        if country_code == 'NO':
+        if is_norwegian_visitor():
             if product_taxes is None:
                 # Same default as website_sale, computed here because the
                 # fiscal-position mapping must be skipped for these visitors.
