@@ -10,4 +10,15 @@
         </xpath>
     </template>
 
+    <template id="signup" inherit_id="auth_signup.signup">
+        <xpath expr="//label[@for='name']" position="replace">
+            <label for="name" class="form-label">First and last name</label>
+        </xpath>
+        <xpath expr="//input[@name='name']" position="attributes">
+            <attribute name="class"/>
+            <attribute name="t-attf-class">form-control #{'is-invalid' if invalid_name else ''}</attribute>
+            <attribute name="placeholder">e.g. John Smith</attribute>
+        </xpath>
+    </template>
+
 </odoo>

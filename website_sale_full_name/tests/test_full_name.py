@@ -1,6 +1,7 @@
 import json
+from unittest.mock import patch
 
-from odoo.tests import BaseCase, tagged
+from odoo.tests import BaseCase, HttpCase, tagged
 
 from odoo.addons.website_sale.tests.common import WebsiteSaleCommon
 from odoo.addons.website_sale_full_name.controllers.main import WebsiteSaleFullName, is_full_name
@@ -60,3 +61,40 @@ class TestCheckoutFullName(WebsiteSaleCommon):
         result = self._submit('Jan Hansen')
         self.assertNotIn('invalid_fields', result)
         self.assertIn('redirectUrl', result)
+
+
+@tagged('post_install', '-at_install')
+class TestSignupFullName(HttpCase):
+
+    def setUp(self):
+        super().setUp()
+        self.env['ir.config_parameter'].sudo().set_str('auth_signup.invitation_scope', 'b2c')
+        # The captcha is not what is tested here.
+        captcha_patcher = patch.object(
+            self.env.registry['ir.http'], '_verify_request_recaptcha_token', lambda *args: None
+        )
+        captcha_patcher.start()
+        self.addCleanup(captcha_patcher.stop)
+
+    def _signup(self, name, login):
+        self.authenticate(None, None)
+        return self.url_open('/web/signup', data={
+            'name': name,
+            'login': login,
+            'password': 'a-long-password',
+            'confirm_password': 'a-long-password',
+            'csrf_token': self.csrf_token(),
+        })
+
+    def test_single_name_is_refused(self):
+        response = self._signup('Jan', 'jan.single@example.com')
+        self.assertIn(
+            "Please enter your full first name and last name (e.g. John Smith).", response.text
+        )
+        self.assertIn('is-invalid', response.text)
+        self.assertFalse(self.env['res.users'].search([('login', '=', 'jan.single@example.com')]))
+
+    def test_full_name_is_accepted(self):
+        response = self._signup('Jan Hansen', 'jan.hansen@example.com')
+        self.assertNotIn("Please enter your full first name and last name", response.text)
+        self.assertTrue(self.env['res.users'].search([('login', '=', 'jan.hansen@example.com')]))

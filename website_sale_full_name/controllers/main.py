@@ -1,3 +1,7 @@
+from odoo import http
+from odoo.http import request
+
+from odoo.addons.auth_signup.controllers.main import AuthSignupHome
 from odoo.addons.website_sale.controllers.main import WebsiteSale
 
 MIN_NAME_PART_LETTERS = 2
@@ -17,6 +21,10 @@ def is_full_name(name):
         sum(char.isalpha() for char in part) >= MIN_NAME_PART_LETTERS
         for part in (parts[0], parts[-1])
     )
+
+
+def full_name_error(env):
+    return env._("Please enter your full first name and last name (e.g. John Smith).")
 
 
 class WebsiteSaleFullName(WebsiteSale):
@@ -46,7 +54,35 @@ class WebsiteSaleFullName(WebsiteSale):
             and not is_full_name(address_values['name'])
         ):
             invalid_fields.add('name')
-            error_messages.append(self.env._(
-                "Please enter your full first name and last name (e.g. John Smith)."
-            ))
+            error_messages.append(full_name_error(self.env))
         return invalid_fields, missing_fields, error_messages
+
+
+class AuthSignupFullName(AuthSignupHome):
+
+    @http.route()
+    def web_auth_signup(self, *args, **kw):
+        """Override of `auth_signup` to require a first and a last name on the sign up page.
+
+        The flag scopes the check to this page: `get_auth_signup_qcontext` is shared with the
+        password reset, which must keep working for accounts whose name is a single word.
+        """
+        request.update_context(signup_require_full_name=True)
+        return super().web_auth_signup(*args, **kw)
+
+    def get_auth_signup_qcontext(self):
+        """Override of `auth_signup` to refuse a sign up whose name is not a full name.
+
+        An `error` in the rendering context makes `web_auth_signup` skip the account creation
+        and render the form again, with the message in its error box.
+        """
+        qcontext = super().get_auth_signup_qcontext()
+        if (
+            request.env.context.get('signup_require_full_name')
+            and request.httprequest.method == 'POST'
+            and 'error' not in qcontext
+            and not is_full_name(qcontext.get('name'))
+        ):
+            qcontext['error'] = full_name_error(request.env)
+            qcontext['invalid_name'] = True
+        return qcontext
