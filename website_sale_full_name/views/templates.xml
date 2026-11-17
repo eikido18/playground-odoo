@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="address_form_fields" inherit_id="portal.address_form_fields">
+        <xpath expr="//label[@for='o_name']" position="replace">
+            <label class="col-form-label" for="o_name">First and last name</label>
+        </xpath>
+        <xpath expr="//input[@id='o_name']" position="attributes">
+            <attribute name="placeholder">e.g. John Smith</attribute>
+        </xpath>
+    </template>
+
+</odoo>
