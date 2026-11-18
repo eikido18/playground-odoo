@@ -1,0 +1,35 @@
+<odoo>
+    <record id="product_normal_form_view" model="ir.ui.view">
+        <field name="name">product.product.form.inherit.comparison.price.variant</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <field name="categ_id" position="before">
+                <label for="compare_list_price" groups="website_sale.group_product_price_comparison"/>
+                <div class="o_row" groups="website_sale.group_product_price_comparison">
+                    <del class="oe_read_only">
+                        <field name="compare_list_price" nolabel="1" widget="monetary" options="{'currency_field': 'currency_id', 'field_digits': True}"/>
+                    </del>
+                    <field name="compare_list_price" nolabel="1" widget="monetary" options="{'currency_field': 'currency_id', 'field_digits': True}" class="oe_edit_only"/>
+                </div>
+            </field>
+        </field>
+    </record>
+
+    <record id="product_product_tree_view" model="ir.ui.view">
+        <field name="name">product.product.list.inherit.comparison.price.variant</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_product_tree_view"/>
+        <field name="arch" type="xml">
+            <field name="lst_price" position="after">
+                <field
+                    name="compare_list_price"
+                    optional="show"
+                    options="{'currency_field': 'currency_id'}"
+                    widget="monetary"
+                    groups="website_sale.group_product_price_comparison"
+                />
+            </field>
+        </field>
+    </record>
+</odoo>

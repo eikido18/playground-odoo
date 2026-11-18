@@ -1,0 +1,17 @@
+<odoo>
+    <!-- Always render the strikethrough so that it can be shown when the customer picks a
+         variant with a comparison price, even if the first variant shown has none. -->
+    <template id="product_price" inherit_id="website_sale.product_price" name="website_sale.product_price.inherit.comparison.price.variant">
+        <xpath expr="//del[@name='product_price_strikethrough']" position="before">
+            <t t-set="show_compare_list_price" t-value="combination_info.get('compare_list_price') and combination_info['compare_list_price'] &gt; combination_info['price']"/>
+        </xpath>
+        <xpath expr="//del[@name='product_price_strikethrough']" position="attributes">
+            <attribute name="t-if"/>
+            <attribute name="class"/>
+            <attribute name="t-attf-class">text-muted ms-1 h6 oe_compare_list_price {{'' if show_compare_list_price else 'd-none'}}</attribute>
+        </xpath>
+        <xpath expr="//del[@name='product_price_strikethrough']//span" position="attributes">
+            <attribute name="t-out">combination_info.get('compare_list_price', 0)</attribute>
+        </xpath>
+    </template>
+</odoo>
