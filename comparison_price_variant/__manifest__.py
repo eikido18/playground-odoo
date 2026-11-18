@@ -1,7 +1,7 @@
 {
     'name': 'Comparison Price Variant',
     'author': 'JH, Claude',
-    'version': '20.0.1.0.0',
+    'version': '20.0.1.1.0',
     'category': 'Website/Website',
     'summary': 'Comparison (strikethrough) price per product variant',
     'description': """
@@ -13,6 +13,10 @@
         the variant. It is shown as the strikethrough price on the /shop grid, on
         the product page (updated when another variant is picked), in product
         snippets such as the products carousel, and in the product comparison.
+
+        In the Google Merchant Center product feeds, a comparison price above the
+        actual price is sent as the "price", with the actual price as the
+        "sale_price", the same way pricelist discounts are reported.
     """,
     'depends': ['website_sale'],
     'data': [
