@@ -8,7 +8,7 @@
             <div t-if="free_qty &gt; 0"
                  t-attf-class="availability_message_#{product_template} my-3">
                 <span class="badge text-bg-success">
-                    <i class="fa fa-circle me-2 text-success"/>I lager
+                    <i class="oi oi-filled me-2 text-success" data-icon="circle"/>I lager
                 </span>
             </div>
         </xpath>
