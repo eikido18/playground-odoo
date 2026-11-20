@@ -18,6 +18,9 @@
         'web.assets_frontend': [
             'product_instock/static/src/xml/product_instock.xml',
         ],
+        'web.assets_tests': [
+            'product_instock/static/tests/tours/*',
+        ],
     },
     'installable': True,
     'auto_install': False,
