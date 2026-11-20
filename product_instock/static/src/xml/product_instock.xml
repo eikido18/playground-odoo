@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="product_instock.in_stock_badge"
+       t-inherit="website_sale_stock.product_availability"
+       t-inherit-mode="extension">
+        <xpath expr="//div[@id='threshold_message']" position="after">
+            <div t-if="free_qty &gt; 0"
+                 t-attf-class="availability_message_#{product_template} my-3">
+                <span class="badge text-bg-success">
+                    <i class="fa fa-circle me-2 text-success"/>I lager
+                </span>
+            </div>
+        </xpath>
+    </t>
+
+</templates>
