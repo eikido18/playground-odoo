@@ -33,3 +33,40 @@ Tests: `odev test -V 20.0 <fresh_db> -i show_inc_vat -t /show_inc_vat` -> 0 fail
 3. Browse from another country (e.g. Sweden) with a similar fiscal position: prices show **without** VAT.
 4. As the Norwegian visitor, add to cart and checkout: the order uses the fiscal position (no VAT charged).
 5. Product page with variants/configurator: extra prices follow the same rule.
+
+## product_instock
+
+### Technical summary
+- Manifest version bumped to `20.0.1.0.0` (module was imported as-is from 19.0 first, commit `[ADD]`).
+- `odoo-bin upgrade_code --from 19.0 --to 20.0`: the frontend badge icon `fa fa-circle` became
+  `<i class="oi oi-filled" data-icon="circle"/>` (script `19.5-00-material-symbols-icons`).
+  Note: with the 20.0 venv (Python 3.12) the glob must be `product_instock/**/*`;
+  `product_instock/**` only matches directories and silently changes nothing.
+- Frontend QWeb extension retargeted from `website_sale_stock.product_availability` (removed) to
+  `website_sale.product_availability`. Expressions now read `this.free_qty` / `this.product_template`,
+  as the core template does. The badge is still inserted after `#threshold_message`, inside the
+  `is_storable and !prevent_sale` guard.
+- Backend form/kanban views and the `is_in_stock` compute (`qty_available`) are unchanged: their
+  anchors (`button_box`, `t-name="card"`) still exist in 20.0.
+- Added `tests/test_product_instock.py` (compute test + `product_instock_*` tours) and the
+  `web.assets_tests` entry.
+
+### Odoo sources
+| Breaking change | Odoo commit |
+| --- | --- |
+| `website_sale_stock.product_availability` removed, availability moved to `website_sale.product_availability` | [odoo/odoo@2378d9d5b4f6](https://github.com/odoo/odoo/commit/2378d9d5b4f60300d0c7d00558d8e8c71f9b01eb) (odoo/odoo#256137) |
+| FontAwesome replaced by Material Symbols (`oi` + `data-icon`) | `odoo/upgrade_code/19.5-00-material-symbols-icons.py` |
+
+Tests: `odev test -c -V 20.0 <fresh_db> -i product_instock -t /product_instock` -> 0 failed, 0 errors.
+The tour was **skipped** in the upgrade sandbox (headless Chrome missing `libatk-1.0.so.0`); the
+inheritance was checked instead by applying the xpath to the 20.0 parent template and by confirming
+`web.assets_frontend` builds with `product_instock.in_stock_badge`. Run the tour where Chrome works.
+
+### Functional test scenarios
+1. Backend: open a storable product with on-hand quantity > 0: the green **I lager** badge shows in the
+   form (button box area) and on its kanban card; with 0 on hand, no badge.
+2. Website: open the product page of a storable, published product with free quantity > 0: the
+   **I lager** badge shows under the availability messages.
+3. Set "Show available qty" with a threshold above the stock: the threshold badge and **I lager** both show.
+4. Product with 0 free quantity and out-of-stock orders disallowed: "Out of Stock" shows, no **I lager**.
+5. Product with variants: switching to an out-of-stock variant hides the badge; switching back shows it.
