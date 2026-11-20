@@ -1,6 +1,6 @@
 {
     'name': 'Product In Stock Notice',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'category': 'Inventory',
     'summary': 'Shows "I lager" indicator on products that are in stock',
     'description': """
